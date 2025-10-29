@@ -1,0 +1,544 @@
+<!DOCTYPE html [
+        <!ENTITY nbsp "&#160;">
+]>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Medical Prescription</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        /* Define page margins with space for header and footer */
+        @page {
+            size: A4;
+            /* Space for header */
+            /* Space for footer */
+            margin: 4cm 2cm 3cm;
+
+            @top-center {
+                content: element(header);
+            }
+
+            @bottom-center {
+                content: element(footer);
+            }
+        }
+
+        /* Repeating Header */
+        #header {
+            position: running(header);
+            width: 100%;
+            border-bottom: 3px solid #2c5aa0;
+            padding-bottom: 15px;
+        }
+
+        .header-content {
+            display: table;
+            width: 100%;
+        }
+
+        .header-logo {
+            display: table-cell;
+            width: 80px;
+            vertical-align: middle;
+        }
+
+        .header-info {
+            display: table-cell;
+            vertical-align: middle;
+            padding-left: 15px;
+        }
+
+        .header-info h1 {
+            margin: 0 0 5px 0;
+            font-size: 22px;
+            color: #2c5aa0;
+            font-weight: bold;
+        }
+
+        .header-info p {
+            margin: 2px 0;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .header-icon {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
+        /* Repeating Footer */
+        #footer {
+            position: running(footer);
+            width: 100%;
+            border-top: 2px solid #2c5aa0;
+            padding-top: 10px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .footer-content {
+            margin-bottom: 5px;
+        }
+
+        .footer-icon {
+            width: 12px;
+            height: 12px;
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 3px;
+        }
+
+        #footer::after {
+            content: "Page " counter(page) " of " counter(pages);
+            display: block;
+            margin-top: 8px;
+            font-size: 9px;
+            color: #999;
+        }
+
+        /* Main Content */
+        .prescription-content {
+            font-size: 13px;
+        }
+
+        .doctor-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2c5aa0;
+        }
+
+        .doctor-section h2 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #2c5aa0;
+        }
+
+        .doctor-info, .patient-info {
+            display: table;
+            width: 100%;
+        }
+
+        .info-row {
+            display: table-row;
+        }
+
+        .info-label {
+            display: table-cell;
+            font-weight: bold;
+            padding: 4px 10px 4px 0;
+            width: 120px;
+            color: #555;
+        }
+
+        .info-value {
+            display: table-cell;
+            padding: 4px 0;
+            color: #333;
+        }
+
+        .patient-section {
+            background: #fff;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .patient-section h2 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #2c5aa0;
+        }
+
+        .vital-signs {
+            display: table;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .vital-row {
+            display: table-row;
+        }
+
+        .vital-cell {
+            display: table-cell;
+            padding: 5px 10px;
+            background: #f0f4f8;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .vital-label {
+            font-size: 10px;
+            color: #666;
+            display: block;
+        }
+
+        .vital-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #2c5aa0;
+            display: block;
+        }
+
+        .diagnosis-section {
+            margin-bottom: 20px;
+        }
+
+        .diagnosis-section h2 {
+            font-size: 16px;
+            color: #2c5aa0;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+
+        .diagnosis-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .diagnosis-list li {
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            background: #f8f9fa;
+            border-left: 3px solid #28a745;
+            border-radius: 3px;
+        }
+
+        .medications-section h2 {
+            font-size: 16px;
+            color: #2c5aa0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+
+        .medication-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: #fff;
+            page-break-inside: avoid;
+        }
+
+        .medication-header {
+            display: table;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .medication-icon-cell {
+            display: table-cell;
+            width: 30px;
+            vertical-align: top;
+        }
+
+        .medication-details-cell {
+            display: table-cell;
+            vertical-align: top;
+        }
+
+        .medication-name {
+            font-size: 15px;
+            font-weight: bold;
+            color: #2c5aa0;
+            margin: 0 0 5px 0;
+        }
+
+        .medication-dosage {
+            font-size: 13px;
+            color: #666;
+            margin: 0 0 5px 0;
+        }
+
+        .medication-instructions {
+            font-size: 12px;
+            color: #555;
+            background: #f0f4f8;
+            padding: 8px;
+            border-radius: 3px;
+            margin-top: 5px;
+        }
+
+        .medication-duration {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .notes-section {
+            background: #fffbea;
+            border: 1px solid #f0e68c;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .notes-section h2 {
+            font-size: 14px;
+            color: #d68910;
+            margin: 0 0 10px 0;
+        }
+
+        .notes-section p {
+            font-size: 12px;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .signature-section {
+            margin-top: 30px;
+            text-align: right;
+        }
+
+        .signature-line {
+            display: inline-block;
+            border-top: 2px solid #333;
+            padding-top: 5px;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .signature-name {
+            font-weight: bold;
+            font-size: 13px;
+            color: #2c5aa0;
+        }
+
+        .signature-title {
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* SVG Icons embedded as data URIs */
+        .logo-svg {
+            width: 70px;
+            height: 70px;
+        }
+
+        .pill-icon {
+            width: 24px;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+<!-- Repeating Header -->
+<div id="header">
+    <div class="header-content">
+        <div class="header-logo">
+            <!-- Hospital Logo SVG -->
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" fill="#2c5aa0" stroke="#1a3a6b" stroke-width="2"/>
+                <rect x="40" y="25" width="20" height="50" fill="white"/>
+                <rect x="25" y="40" width="50" height="20" fill="white"/>
+                <circle cx="50" cy="50" r="10" fill="#2c5aa0"/>
+            </svg>
+        </div>
+        <div class="header-info">
+            <h1 th:text="${prescription.hospitalName}">City General Hospital</h1>
+            <p>
+                <svg class="header-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#666"
+                          d="M8 0C5.2 0 3 2.2 3 5c0 3.5 5 11 5 11s5-7.5 5-11c0-2.8-2.2-5-5-5zm0 7c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+                </svg>
+                <span th:text="${prescription.hospitalAddress}">123 Medical Center Blvd, Healthcare City</span>
+            </p>
+            <p>
+                <svg class="header-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#666"
+                          d="M3 1h10c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2zm0 2v10h10V3H3zm2 2h6v1H5V5zm0 2h6v1H5V7zm0 2h4v1H5V9z"/>
+                </svg>
+                Phone: <span th:text="${prescription.hospitalPhone}">+1-555-0123</span>
+                &nbsp;|&nbsp;
+                <svg class="header-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#666"
+                          d="M2 3l6 4 6-4v10H2V3zm0-2h12c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H2c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2z"/>
+                </svg>
+                Email: <span th:text="${prescription.hospitalEmail}">contact@hospital.com</span>
+            </p>
+            <p style="font-weight: bold; color: #2c5aa0;">License No: <span th:text="${prescription.hospitalLicense}">MED-2025-12345</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Repeating Footer -->
+<div id="footer">
+    <div class="footer-content">
+        <p style="margin: 3px 0;">
+            <svg class="footer-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#666" d="M8 0l2 5h5l-4 3.5 2 5.5-5-3.5-5 3.5 2-5.5-4-3.5h5z"/>
+            </svg>
+            This is a computer-generated prescription and requires verification
+            <svg class="footer-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#666" d="M8 0l2 5h5l-4 3.5 2 5.5-5-3.5-5 3.5 2-5.5-4-3.5h5z"/>
+            </svg>
+        </p>
+        <p style="margin: 3px 0; font-weight: bold;">For any queries, please contact the hospital directly</p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="prescription-content">
+    <!-- Doctor Information -->
+    <div class="doctor-section">
+        <h2>Prescribing Physician</h2>
+        <div class="doctor-info">
+            <div class="info-row">
+                <div class="info-label">Doctor Name:</div>
+                <div class="info-value" th:text="${prescription.doctorName}">Dr. Sarah Johnson</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Specialization:</div>
+                <div class="info-value" th:text="${prescription.doctorSpecialization}">Internal Medicine</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">License Number:</div>
+                <div class="info-value" th:text="${prescription.doctorLicense}">MD-123456</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Date:</div>
+                <div class="info-value" th:text="${#temporals.format(prescription.prescriptionDate, 'dd MMM yyyy')}">29
+                    Oct 2025
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Information -->
+    <div class="patient-section">
+        <h2>Patient Information</h2>
+        <div class="patient-info">
+            <div class="info-row">
+                <div class="info-label">Patient Name:</div>
+                <div class="info-value" th:text="${prescription.patientName}">John Michael Doe</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Age / Gender:</div>
+                <div class="info-value">
+                    <span th:text="${prescription.patientAge}">45</span> years /
+                    <span th:text="${prescription.patientGender}">Male</span>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Patient ID:</div>
+                <div class="info-value" th:text="${prescription.patientId}">PAT-2025-9876</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Contact:</div>
+                <div class="info-value" th:text="${prescription.patientContact}">+1-555-9876</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Address:</div>
+                <div class="info-value" th:text="${prescription.patientAddress}">456 Oak Street, Healthville</div>
+            </div>
+        </div>
+
+        <!-- Vital Signs -->
+        <div class="vital-signs">
+            <div class="vital-row">
+                <div class="vital-cell">
+                    <span class="vital-label">Blood Pressure</span>
+                    <span class="vital-value" th:text="${prescription.bloodPressure}">120/80</span>
+                </div>
+                <div class="vital-cell">
+                    <span class="vital-label">Heart Rate</span>
+                    <span class="vital-value" th:text="${prescription.heartRate}">72 bpm</span>
+                </div>
+                <div class="vital-cell">
+                    <span class="vital-label">Temperature</span>
+                    <span class="vital-value" th:text="${prescription.temperature}">98.6°F</span>
+                </div>
+                <div class="vital-cell">
+                    <span class="vital-label">Weight</span>
+                    <span class="vital-value" th:text="${prescription.weight}">75 kg</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Diagnosis -->
+    <div class="diagnosis-section">
+        <h2>Diagnosis</h2>
+        <ul class="diagnosis-list">
+            <li th:each="diagnosis : ${prescription.diagnoses}" th:text="${diagnosis}">
+                Upper Respiratory Tract Infection (URTI)
+            </li>
+        </ul>
+    </div>
+
+    <!-- Medications -->
+    <div class="medications-section">
+        <h2>Prescribed Medications</h2>
+
+        <div th:each="med : ${prescription.medications}" class="medication-card">
+            <div class="medication-header">
+                <div class="medication-icon-cell">
+                    <!-- Pill Icon SVG -->
+                    <svg class="pill-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <ellipse cx="12" cy="12" rx="10" ry="6" fill="#4CAF50" transform="rotate(45 12 12)"/>
+                        <rect x="8" y="11" width="8" height="2" fill="white" transform="rotate(45 12 12)"/>
+                    </svg>
+                </div>
+                <div class="medication-details-cell">
+                    <h3 class="medication-name" th:text="${med.name}">Amoxicillin</h3>
+                    <p class="medication-dosage">
+                        <strong>Dosage:</strong> <span th:text="${med.dosage}">500mg</span>
+                        &nbsp;|&nbsp;
+                        <strong>Frequency:</strong> <span th:text="${med.frequency}">3 times daily</span>
+                    </p>
+                    <div class="medication-instructions">
+                        <strong>Instructions:</strong> <span th:text="${med.instructions}">Take one capsule three times daily after meals</span>
+                    </div>
+                    <p class="medication-duration">
+                        <strong>Duration:</strong> <span th:text="${med.duration}">7 days</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Notes -->
+    <div class="notes-section">
+        <h2>⚠ Important Notes &amp; Precautions</h2>
+        <p th:each="note : ${prescription.notes}" th:text="${note}">
+            • Take all medications as prescribed, even if you start feeling better
+        </p>
+    </div>
+
+    <!-- Follow-up -->
+    <div style="margin-top: 20px; padding: 10px; background: #e8f5e9; border-left: 4px solid #4CAF50; border-radius: 3px;">
+        <p style="margin: 0; font-size: 12px;">
+            <strong>Follow-up Visit:</strong>
+            <span th:text="${prescription.followUpDate != null ? #temporals.format(prescription.followUpDate, 'dd MMM yyyy') : 'As needed'}">07 Nov 2025</span>
+        </p>
+    </div>
+
+    <!-- Signature -->
+    <div class="signature-section">
+        <div class="signature-line">
+            <div class="signature-name" th:text="${prescription.doctorName}">Dr. Sarah Johnson</div>
+            <div class="signature-title" th:text="${prescription.doctorSpecialization}">Internal Medicine Specialist
+            </div>
+            <div class="signature-title">Reg. No: <span th:text="${prescription.doctorLicense}">MD-123456</span></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

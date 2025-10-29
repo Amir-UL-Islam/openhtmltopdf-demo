@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Invoice</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Define page margins with enough space for header and footer */
+        @page {
+            size: A4;
+            /* Space for header */
+            /* Space for footer */
+            margin: 3cm 2cm 2.5cm;
+
+            @top-center {
+                content: element(header);
+            }
+
+            @bottom-center {
+                content: element(footer);
+            }
+        }
+
+        /* Define the repeating header content */
+        #header {
+            position: running(header);
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            width: 100%;
+        }
+
+        #header h1 {
+            margin: 5px 0;
+            font-size: 20px;
+            color: #333;
+        }
+
+        #header p {
+            margin: 3px 0;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Define the repeating footer content */
+        #footer {
+            position: running(footer);
+            text-align: center;
+            border-top: 2px solid #333;
+            padding-top: 10px;
+            width: 100%;
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* Add page numbers to footer */
+        #footer::after {
+            content: "Page " counter(page) " of " counter(pages);
+            display: block;
+            margin-top: 5px;
+            font-size: 10px;
+        }
+
+        /* Main content styling - no extra margins needed now */
+        .page-content {
+            /* Removed margin-top and margin-bottom as @page margins handle this */
+        }
+
+        .bill-to {
+            margin-bottom: 20px;
+        }
+
+        .bill-to h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .bill-to p {
+            margin: 3px 0;
+            font-size: 13px;
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #333;
+        }
+
+        td {
+            color: #555;
+        }
+
+        /* Repeat table header on each page */
+        thead {
+            display: table-header-group;
+        }
+
+        /* Prevent page breaks inside table rows */
+        tr {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+<!-- Repeating header content -->
+<div id="header">
+    <h1 th:text="${invoice.companyName}">ACME Inc.</h1>
+    <p>Invoice #<span th:text="${invoice.invoiceNumber}"></span></p>
+    <p>Date: <span th:text="${#temporals.format(invoice.invoiceDate, 'dd-MMM-yyyy')}"></span></p>
+</div>
+
+<!-- Repeating footer content -->
+<div id="footer">
+    <p>Thank you for your business!</p>
+</div>
+
+<!-- Main content that will span multiple pages -->
+<div class="page-content">
+    <div class="bill-to">
+        <h2>Bill To:</h2>
+        <p th:text="${invoice.customer.name}">John Doe</p>
+        <p th:text="${invoice.customer.address}">123 Main St</p>
+    </div>
+
+    <h2 style="font-size: 16px; margin-bottom: 10px; color: #333;">Invoice Items</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${invoice.items}">
+            <td th:text="${item.description}">Item Description</td>
+            <td th:text="${item.quantity}">1</td>
+            <td th:text="${#numbers.formatDecimal(item.price, 0, 'POINT', 2, 'POINT')}">0.00</td>
+            <td th:text="${#numbers.formatDecimal(item.total, 0, 'POINT', 2, 'POINT')}">0.00</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
