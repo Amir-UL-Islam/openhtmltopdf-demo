@@ -1,5 +1,6 @@
 package amir.demo.openhtmltopdfdemo.controller;
 
+import amir.demo.openhtmltopdfdemo.Utils;
 import amir.demo.openhtmltopdfdemo.model.dto.Medicine;
 import amir.demo.openhtmltopdfdemo.service.InvoiceGenerationService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,9 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 class InvoicePDFController {
+
+    AtomicLong counter = new AtomicLong();
 
     @Autowired
     private InvoiceGenerationService invoiceGenerationService;
@@ -34,7 +38,7 @@ class InvoicePDFController {
 
         // Set response headers for PDF download
         response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=prescription.pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=" + Utils.getString(counter.getAndIncrement()) + "-invoice.pdf");
         response.getOutputStream().write(pdfBytes);
     }
 }
