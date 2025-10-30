@@ -3,6 +3,7 @@ package amir.demo.openhtmltopdfdemo.controller;
 import amir.demo.openhtmltopdfdemo.Utils;
 import amir.demo.openhtmltopdfdemo.model.dto.Medicine;
 import amir.demo.openhtmltopdfdemo.service.InvoiceGenerationService;
+import amir.demo.openhtmltopdfdemo.service.OpenPdfInvoiceService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,8 @@ class InvoicePDFController {
 
     AtomicLong counter = new AtomicLong();
 
+    @Autowired
+    private OpenPdfInvoiceService openPdfInvoiceService;
     @Autowired
     private InvoiceGenerationService invoiceGenerationService;
 
@@ -35,6 +38,17 @@ class InvoicePDFController {
         );
 
         byte[] pdfBytes = invoiceGenerationService.generateInvoicePdf();
+
+        // Set response headers for PDF download
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=" + Utils.getString(counter.getAndIncrement()) + "-invoice.pdf");
+        response.getOutputStream().write(pdfBytes);
+    }
+
+    @GetMapping("/generate/invoice/openpdf")
+    public void generateFromOpenPdf(HttpServletResponse response) throws IOException {
+        // Sample data
+        byte[] pdfBytes = openPdfInvoiceService.generateInvoicePdf();
 
         // Set response headers for PDF download
         response.setContentType("application/pdf");
